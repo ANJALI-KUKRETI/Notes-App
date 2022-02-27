@@ -1,0 +1,32 @@
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1.3rem 5rem;
+  /* background-color: rgb(228, 220, 220); */
+}
+.logo {
+  cursor: pointer;
+}
+.links {
+  width: 30%;
+}
+.links ul {
+  list-style: none;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.links ul li {
+  cursor: pointer;
+}
+.links ul li :hover {
+  color: rgb(136, 135, 135);
+}
+.mode {
+  font-size: 25px;
+  padding: 8px 12px 5px;
+  cursor: pointer;
+  background-color: rgb(201, 198, 198);
+  border-radius: 50%;
+}
