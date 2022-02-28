@@ -1,11 +1,26 @@
-.pal {
-  display: flex;
-  flex-direction: column;
-  width: 5%;
-  justify-content: space-evenly;
-  align-items: center;
-}
 .add {
   font-size: 2rem;
   color: rgb(61, 61, 61);
+  cursor: pointer;
+}
+.palatte {
+  background-color: white;
+  padding: 18px;
+  border-radius: 5px;
+  height: 75vh;
+  /* width: 5%; */
+  /* width: 70%; */
+}
+.palatte ul {
+  height: 100%;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+.tooltip {
+  font-size: 15px !important;
+  font-weight: bold;
+  color: rgb(61, 61, 61) !important;
 }

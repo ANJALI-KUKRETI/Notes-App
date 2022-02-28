@@ -16,11 +16,11 @@ const Header = () => {
           <li>
             <h3>Personal </h3>
           </li>
-          <li class="mode">
+          {/* <li className="mode">
             <div>
               <FiMoon />
             </div>
-          </li>
+          </li> */}
         </ul>
       </div>
     </div>

@@ -1,15 +1,26 @@
 import React from "react";
-import ColorPalatte from "../ColorPalatte/ColorPalatte";
 import "./palatte.css";
-import { FaPlusCircle } from "react-icons/fa";
+import Color from "./Color";
 
-const palatte = () => {
+const palatte = (props) => {
+  const colors = [
+    "aqua",
+    "rgb(247, 192, 125)",
+    "rgb(223, 169, 178)",
+    "rgb(193, 236, 127)",
+    "rgb(131, 206, 241)",
+    "rgb(238, 238, 113)",
+    "rgb(240, 116, 116)",
+    "rgb(241, 88, 241)",
+    "rgb(238, 175, 39)",
+  ];
   return (
-    <div className="pal">
-      <div className="add">
-        <FaPlusCircle />
-      </div>
-      <ColorPalatte />
+    <div className="palatte">
+      <ul>
+        {colors.map((color, index) => (
+          <Color color={color} key={index} addNote={props.addNote} />
+        ))}
+      </ul>
     </div>
   );
 };
