@@ -2,47 +2,21 @@ import React from "react";
 import Card from "./Card";
 import "./CardHolder.css";
 
-const CardHolder = ({ notes }) => {
+const CardHolder = ({ notes, onDelete, onUpdate, onDone, eye }) => {
+  const newarr = [...notes].reverse();
   return (
     <div className="cardHolder">
-      {notes.map((note) => (
-        <Card key={note.id} note={note} />
+      {newarr.map((note) => (
+        <Card
+          key={note.id}
+          note={note}
+          text={note.text}
+          onDelete={onDelete}
+          onUpdate={onUpdate}
+          onDone={onDone}
+          eye={eye}
+        />
       ))}
-      {/* <Card
-        note={{
-          text: "kfansc",
-          date: "22/02/2022",
-          color: "yellow",
-        }}
-      />
-      <Card
-        note={{
-          text: "kfansc",
-          date: "22/02/2022",
-          color: "rgb(193, 236, 127)",
-        }}
-      />
-      <Card
-        note={{
-          text: "kfansc",
-          date: "22/02/2022",
-          color: "rgb(193, 236, 127)",
-        }}
-      />
-      <Card
-        note={{
-          text: "kfansc",
-          date: "22/02/2022",
-          color: "rgb(193, 236, 127)",
-        }}
-      />
-      <Card
-        note={{
-          text: "kfansc",
-          date: "22/02/2022",
-          color: "rgb(193, 236, 127)",
-        }}
-      /> */}
     </div>
   );
 };

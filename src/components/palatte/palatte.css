@@ -1,15 +1,8 @@
-.add {
-  font-size: 2rem;
-  color: rgb(61, 61, 61);
-  cursor: pointer;
-}
 .palatte {
   background-color: white;
   padding: 18px;
   border-radius: 5px;
   height: 75vh;
-  /* width: 5%; */
-  /* width: 70%; */
 }
 .palatte ul {
   height: 100%;
@@ -23,4 +16,14 @@
   font-size: 15px !important;
   font-weight: bold;
   color: rgb(61, 61, 61) !important;
+}
+@media (max-width: 800px) {
+  .palatte {
+    height: 8vh;
+    padding: 0px 10px;
+    margin-bottom: 1rem;
+  }
+  .palatte ul {
+    flex-direction: row;
+  }
 }

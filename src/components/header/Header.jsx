@@ -1,6 +1,6 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 import "./Header.css";
-import { FiMoon } from "react-icons/fi";
 
 const Header = () => {
   return (
@@ -10,17 +10,22 @@ const Header = () => {
       </div>
       <div className="links">
         <ul>
-          <li>
-            <h3>All</h3>
-          </li>
-          <li>
-            <h3>Personal </h3>
-          </li>
-          {/* <li className="mode">
-            <div>
-              <FiMoon />
-            </div>
-          </li> */}
+          <NavLink
+            className={(navdata) => (navdata.isActive ? "active" : "link")}
+            to="/"
+          >
+            <li>
+              <h3>All Notes</h3>
+            </li>
+          </NavLink>
+          <NavLink
+            className={(navdata) => (navdata.isActive ? "active" : "link")}
+            to="/complete"
+          >
+            <li>
+              <h3>Completed</h3>
+            </li>
+          </NavLink>
         </ul>
       </div>
     </div>

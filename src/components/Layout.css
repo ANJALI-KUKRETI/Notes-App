@@ -1,3 +1,13 @@
 .layout {
   margin: 3rem 8rem;
 }
+@media (max-width: 1300px) {
+  .layout {
+    margin: 3rem;
+  }
+}
+@media (max-width: 1150px) {
+  .layout {
+    margin: 2rem;
+  }
+}

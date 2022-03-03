@@ -1,10 +1,14 @@
 import React from "react";
 import "./CardHolder.css";
-import { FaEdit } from "react-icons/fa";
+import { BsCheckSquareFill } from "react-icons/bs";
 import { AiFillDelete } from "react-icons/ai";
 import { BsFillPinAngleFill } from "react-icons/bs";
 
-const Card = ({ note }) => {
+const Card = ({ note, onDelete, onUpdate, onDone, eye }) => {
+  const updateText = (text) => {
+    onUpdate(text, note.id);
+  };
+
   return (
     <>
       <div
@@ -16,15 +20,22 @@ const Card = ({ note }) => {
         <div className="pin">
           <BsFillPinAngleFill className="in" />
         </div>
-        <textarea type="text" className="cardInput" />
+        <textarea
+          type="text"
+          className="cardInput"
+          onChange={(event) => updateText(event.target.value)}
+          value={note.text}
+        />
         <div className="lower">
           <div className="date">{note.date}</div>
           <div className="functionality">
-            <div className="edit">
-              <FaEdit />
-            </div>
+            {eye && (
+              <div className="hide">
+                <BsCheckSquareFill onClick={() => onDone(note.id)} />
+              </div>
+            )}
             <div className="delete">
-              <AiFillDelete />
+              <AiFillDelete onClick={() => onDelete(note.id)} />
             </div>
           </div>
         </div>
