@@ -25,6 +25,7 @@ function App() {
   const [user, setUser] = useState(null);
   let [notes, setNotes] = useState([]);
   const [complete, setComplete] = useState([]);
+
   const colRef = collection(db, "notes");
 
   const initials = query(
@@ -33,7 +34,14 @@ function App() {
     where("currentUID", "==", user),
     orderBy("createdAt", "desc")
   );
+  const completed = query(
+    colRef,
+    where("completed", "==", true),
+    where("currentUID", "==", user)
+  );
+
   useEffect(() => {
+    // ===================Adding notes============
     onSnapshot(initials, (snapshot) => {
       let fecthNotes = [];
       snapshot.docs.forEach((doc) => {
@@ -41,21 +49,18 @@ function App() {
       });
       setNotes(fecthNotes);
     });
-  }, []);
 
-  useEffect(() => {
+    //===================Auth===================
     onAuthStateChanged(auth, (userAuth) => {
       if (userAuth) {
         setUser(userAuth.uid);
+        console.log(userAuth);
       } else {
         setUser(null);
       }
     });
-  }, []);
 
-  console.log(user);
-  const completed = query(colRef, where("completed", "==", true));
-  useEffect(() => {
+    //=======================completed Notes===========
     onSnapshot(completed, (snapshot) => {
       let completedNotes = [];
       snapshot.docs.forEach((doc) => {
@@ -63,7 +68,9 @@ function App() {
       });
       setComplete(completedNotes);
     });
-  }, []);
+  }, [user]);
+
+  // console.log(user);
 
   const formatDate = () => {
     const d = new Date();
