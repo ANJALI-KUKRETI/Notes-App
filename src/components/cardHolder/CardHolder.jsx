@@ -13,7 +13,7 @@ const CardHolder = ({ notes, onDelete, onUpdate, onDone, eye }) => {
           text={note.text}
           onDelete={onDelete}
           onUpdate={onUpdate}
-          // onDone={onDone}
+          onDone={onDone}
           eye={eye}
         />
       ))}

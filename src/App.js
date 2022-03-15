@@ -16,14 +16,20 @@ import {
   where,
   orderBy,
   serverTimestamp,
+  updateDoc,
 } from "firebase/firestore";
 
 function App() {
+  const [user, setUser] = useState("A");
   let [notes, setNotes] = useState([]);
   const [complete, setComplete] = useState([]);
 
-  const initials = query(colRef, orderBy("createdAt", "desc"));
-
+  const initials = query(
+    colRef,
+    where("completed", "==", false),
+    orderBy("createdAt", "desc")
+  );
+  console.log(initials);
   useEffect(() => {
     onSnapshot(initials, (snapshot) => {
       let fecthNotes = [];
@@ -35,7 +41,7 @@ function App() {
     });
   }, []);
 
-  const completed = query(colRef, where("completed", "==", "true"));
+  const completed = query(colRef, where("completed", "==", true));
   useEffect(() => {
     onSnapshot(completed, (snapshot) => {
       let completedNotes = [];
@@ -48,20 +54,6 @@ function App() {
   }, []);
   console.log(complete);
   console.log(notes);
-  // const [notes, setNotes] = useState(
-  //   JSON.parse(localStorage.getItem("Sticky-Notes")) || []
-  // );
-
-  // const [complete, setComplete] = useState(
-  //   JSON.parse(localStorage.getItem("complete")) || []
-  // );
-  const [user, setUser] = useState("A");
-  // useEffect(() => {
-  //   localStorage.setItem("Sticky-Notes", JSON.stringify(notes));
-  // }, [notes]);
-  // useEffect(() => {
-  //   localStorage.setItem("complete", JSON.stringify(complete));
-  // }, [complete]);
 
   const formatDate = () => {
     const d = new Date();
@@ -94,33 +86,26 @@ function App() {
   };
 
   const deleteNoteHandler = (id) => {
-    // setNotes(notes.filter((note) => note.id !== id));
-    // setComplete(complete.filter((note) => note.id !== id));
     const docRef = doc(db, "notes", id);
     deleteDoc(docRef);
   };
   const updateNoteHandler = (text, id) => {
-    const temp = [...notes];
-    const i = temp.findIndex((note) => note.id === id);
-    temp[i].text = text;
-    setNotes(temp);
+    const docRef = doc(db, "notes", id);
+    updateDoc(docRef, {
+      text,
+    }).then(() => {
+      console.log("updated");
+    });
   };
 
-  // const updateCompleteNoteHandler = (text, id) => {
-  //   const temp = [...complete];
-  //   const i = temp.findIndex((note) => note.id === id);
-  //   temp[i].text = text;
-  //   setComplete(temp);
-  // };
-
-  // const completeNoteHandler = (id) => {
-  //   const temp = [...notes];
-  //   // const pTemp = [...personal];
-  //   setNotes(temp.filter((note) => note.id !== id));
-  //   const t = temp.findIndex((note) => note.id === id);
-  //   console.log(t);
-  //   setComplete((old) => [...old, temp[t]]);
-  // };
+  const updateCompleteNoteHandler = (id) => {
+    const docRef = doc(db, "notes", id);
+    updateDoc(docRef, {
+      completed: true,
+    });
+    setNotes(notes);
+    setComplete(complete);
+  };
 
   return (
     <>
@@ -132,7 +117,6 @@ function App() {
           <Layout>
             <div className="main">
               <Palatte addNote={addNoteHandler} />
-              {/* <Palatte /> */}
               <Routes>
                 <Route
                   path="/"
@@ -141,7 +125,7 @@ function App() {
                       notes={notes}
                       onDelete={deleteNoteHandler}
                       onUpdate={updateNoteHandler}
-                      // onDone={completeNoteHandler}
+                      onDone={updateCompleteNoteHandler}
                       eye={true}
                     />
                   }
@@ -150,9 +134,9 @@ function App() {
                   path="/complete"
                   element={
                     <CardHolder
-                      // notes={complete}
+                      notes={complete}
                       onDelete={deleteNoteHandler}
-                      // onUpdate={updateCompleteNoteHandler}
+                      onUpdate={updateNoteHandler}
                       eye={false}
                     />
                   }

@@ -4,7 +4,7 @@ import { BsCheckSquareFill } from "react-icons/bs";
 import { AiFillDelete } from "react-icons/ai";
 import { BsFillPinAngleFill } from "react-icons/bs";
 
-const Card = ({ eye, note, onDelete, onUpdate }) => {
+const Card = ({ eye, note, onDelete, onUpdate, onDone }) => {
   const updateText = (text) => {
     onUpdate(text, note.id);
   };
@@ -31,7 +31,7 @@ const Card = ({ eye, note, onDelete, onUpdate }) => {
           <div className="functionality">
             {eye && (
               <div className="hide">
-                <BsCheckSquareFill />
+                <BsCheckSquareFill onClick={() => onDone(note.id)} />
               </div>
             )}
             <div className="delete">
