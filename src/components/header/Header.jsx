@@ -1,12 +1,20 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { signOut } from "firebase/auth";
 import "./Header.css";
+import { auth } from "../../firebase";
 
 const Header = () => {
+  const logoutHandler = () => {
+    signOut(auth);
+  };
   return (
     <div className="nav">
       <div className="logo">
         <h1> Sticky Notes</h1>
+        <button className="logout" onClick={logoutHandler}>
+          Logout
+        </button>
       </div>
       <div className="links">
         <ul>

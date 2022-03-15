@@ -4,7 +4,8 @@ import Layout from "./components/Layout";
 import Header from "./components/header/Header";
 import Palatte from "./components/palatte/Palatte";
 import CardHolder from "./components/cardHolder/CardHolder";
-import { colRef, db } from "./firebase";
+import { auth, colRef, db } from "./firebase";
+import { onAuthStateChanged } from "firebase/auth";
 import "./App.css";
 import LoginScreen from "./components/LoginScreen";
 import {
@@ -17,30 +18,42 @@ import {
   orderBy,
   serverTimestamp,
   updateDoc,
+  collection,
 } from "firebase/firestore";
 
 function App() {
-  const [user, setUser] = useState("A");
+  const [user, setUser] = useState(null);
   let [notes, setNotes] = useState([]);
   const [complete, setComplete] = useState([]);
+  const colRef = collection(db, "notes");
 
   const initials = query(
     colRef,
     where("completed", "==", false),
+    where("currentUID", "==", user),
     orderBy("createdAt", "desc")
   );
-  console.log(initials);
   useEffect(() => {
     onSnapshot(initials, (snapshot) => {
       let fecthNotes = [];
       snapshot.docs.forEach((doc) => {
         fecthNotes.push({ ...doc.data(), id: doc.id });
       });
-      console.log(notes);
       setNotes(fecthNotes);
     });
   }, []);
 
+  useEffect(() => {
+    onAuthStateChanged(auth, (userAuth) => {
+      if (userAuth) {
+        setUser(userAuth.uid);
+      } else {
+        setUser(null);
+      }
+    });
+  }, []);
+
+  console.log(user);
   const completed = query(colRef, where("completed", "==", true));
   useEffect(() => {
     onSnapshot(completed, (snapshot) => {
@@ -48,12 +61,9 @@ function App() {
       snapshot.docs.forEach((doc) => {
         completedNotes.push({ ...doc.data(), id: doc.id });
       });
-      console.log(notes);
       setComplete(completedNotes);
     });
   }, []);
-  console.log(complete);
-  console.log(notes);
 
   const formatDate = () => {
     const d = new Date();
@@ -76,13 +86,13 @@ function App() {
 
   const addNoteHandler = (color) => {
     addDoc(colRef, {
-      text: "Hello",
+      text: "",
       color,
       date: formatDate(),
       completed: false,
       createdAt: serverTimestamp(),
+      currentUID: user,
     });
-    // setNotes(notes);
   };
 
   const deleteNoteHandler = (id) => {
@@ -103,8 +113,6 @@ function App() {
     updateDoc(docRef, {
       completed: true,
     });
-    setNotes(notes);
-    setComplete(complete);
   };
 
   return (
