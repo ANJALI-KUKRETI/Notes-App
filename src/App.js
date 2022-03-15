@@ -4,28 +4,64 @@ import Layout from "./components/Layout";
 import Header from "./components/header/Header";
 import Palatte from "./components/palatte/Palatte";
 import CardHolder from "./components/cardHolder/CardHolder";
+import { colRef, db } from "./firebase";
 import "./App.css";
+import LoginScreen from "./components/LoginScreen";
+import {
+  onSnapshot,
+  addDoc,
+  deleteDoc,
+  doc,
+  query,
+  where,
+  orderBy,
+  serverTimestamp,
+} from "firebase/firestore";
 
 function App() {
-  const [notes, setNotes] = useState(
-    JSON.parse(localStorage.getItem("Sticky-Notes")) || []
-  );
+  let [notes, setNotes] = useState([]);
+  const [complete, setComplete] = useState([]);
 
-  const [complete, setComplete] = useState(
-    JSON.parse(localStorage.getItem("complete")) || []
-  );
+  const initials = query(colRef, orderBy("createdAt", "desc"));
 
-  // const [showEye, setShowEye] = useState(true);
-  // let showEye = true;
-  // if (window.location.pathname === "/personal") {
-  //   showEye = false;
-  // }
   useEffect(() => {
-    localStorage.setItem("Sticky-Notes", JSON.stringify(notes));
-  }, [notes]);
+    onSnapshot(initials, (snapshot) => {
+      let fecthNotes = [];
+      snapshot.docs.forEach((doc) => {
+        fecthNotes.push({ ...doc.data(), id: doc.id });
+      });
+      console.log(notes);
+      setNotes(fecthNotes);
+    });
+  }, []);
+
+  const completed = query(colRef, where("completed", "==", "true"));
   useEffect(() => {
-    localStorage.setItem("complete", JSON.stringify(complete));
-  }, [complete]);
+    onSnapshot(completed, (snapshot) => {
+      let completedNotes = [];
+      snapshot.docs.forEach((doc) => {
+        completedNotes.push({ ...doc.data(), id: doc.id });
+      });
+      console.log(notes);
+      setComplete(completedNotes);
+    });
+  }, []);
+  console.log(complete);
+  console.log(notes);
+  // const [notes, setNotes] = useState(
+  //   JSON.parse(localStorage.getItem("Sticky-Notes")) || []
+  // );
+
+  // const [complete, setComplete] = useState(
+  //   JSON.parse(localStorage.getItem("complete")) || []
+  // );
+  const [user, setUser] = useState("A");
+  // useEffect(() => {
+  //   localStorage.setItem("Sticky-Notes", JSON.stringify(notes));
+  // }, [notes]);
+  // useEffect(() => {
+  //   localStorage.setItem("complete", JSON.stringify(complete));
+  // }, [complete]);
 
   const formatDate = () => {
     const d = new Date();
@@ -47,29 +83,21 @@ function App() {
   };
 
   const addNoteHandler = (color) => {
-    if (window.location.pathname === "/complete") {
-      const temps = [...complete];
-      temps.push({
-        text: "",
-        date: formatDate(),
-        color,
-        id: Date.now(),
-      });
-      setComplete(temps);
-    } else {
-      const temp = [...notes];
-      temp.push({
-        text: "",
-        date: formatDate(),
-        color,
-        id: Date.now(),
-      });
-      setNotes(temp);
-    }
+    addDoc(colRef, {
+      text: "Hello",
+      color,
+      date: formatDate(),
+      completed: false,
+      createdAt: serverTimestamp(),
+    });
+    // setNotes(notes);
   };
+
   const deleteNoteHandler = (id) => {
-    setNotes(notes.filter((note) => note.id !== id));
-    setComplete(complete.filter((note) => note.id !== id));
+    // setNotes(notes.filter((note) => note.id !== id));
+    // setComplete(complete.filter((note) => note.id !== id));
+    const docRef = doc(db, "notes", id);
+    deleteDoc(docRef);
   };
   const updateNoteHandler = (text, id) => {
     const temp = [...notes];
@@ -78,55 +106,62 @@ function App() {
     setNotes(temp);
   };
 
-  const updateCompleteNoteHandler = (text, id) => {
-    const temp = [...complete];
-    const i = temp.findIndex((note) => note.id === id);
-    temp[i].text = text;
-    setComplete(temp);
-  };
+  // const updateCompleteNoteHandler = (text, id) => {
+  //   const temp = [...complete];
+  //   const i = temp.findIndex((note) => note.id === id);
+  //   temp[i].text = text;
+  //   setComplete(temp);
+  // };
 
-  const completeNoteHandler = (id) => {
-    const temp = [...notes];
-    // const pTemp = [...personal];
-    setNotes(temp.filter((note) => note.id !== id));
-    const t = temp.findIndex((note) => note.id === id);
-    console.log(t);
-    setComplete((old) => [...old, temp[t]]);
-  };
+  // const completeNoteHandler = (id) => {
+  //   const temp = [...notes];
+  //   // const pTemp = [...personal];
+  //   setNotes(temp.filter((note) => note.id !== id));
+  //   const t = temp.findIndex((note) => note.id === id);
+  //   console.log(t);
+  //   setComplete((old) => [...old, temp[t]]);
+  // };
 
   return (
     <>
-      <Header />
-      <Layout>
-        <div className="main">
-          <Palatte addNote={addNoteHandler} />
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <CardHolder
-                  notes={notes}
-                  onDelete={deleteNoteHandler}
-                  onUpdate={updateNoteHandler}
-                  onDone={completeNoteHandler}
-                  eye={true}
+      {!user ? (
+        <LoginScreen />
+      ) : (
+        <>
+          <Header />
+          <Layout>
+            <div className="main">
+              <Palatte addNote={addNoteHandler} />
+              {/* <Palatte /> */}
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <CardHolder
+                      notes={notes}
+                      onDelete={deleteNoteHandler}
+                      onUpdate={updateNoteHandler}
+                      // onDone={completeNoteHandler}
+                      eye={true}
+                    />
+                  }
                 />
-              }
-            />
-            <Route
-              path="/complete"
-              element={
-                <CardHolder
-                  notes={complete}
-                  onDelete={deleteNoteHandler}
-                  onUpdate={updateCompleteNoteHandler}
-                  eye={false}
+                <Route
+                  path="/complete"
+                  element={
+                    <CardHolder
+                      // notes={complete}
+                      onDelete={deleteNoteHandler}
+                      // onUpdate={updateCompleteNoteHandler}
+                      eye={false}
+                    />
+                  }
                 />
-              }
-            />
-          </Routes>
-        </div>
-      </Layout>
+              </Routes>
+            </div>
+          </Layout>
+        </>
+      )}
     </>
   );
 }

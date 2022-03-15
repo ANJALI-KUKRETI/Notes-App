@@ -3,7 +3,7 @@ import Card from "./Card";
 import "./CardHolder.css";
 
 const CardHolder = ({ notes, onDelete, onUpdate, onDone, eye }) => {
-  const newarr = [...notes].reverse();
+  const newarr = [...notes];
   return (
     <div className="cardHolder">
       {newarr.map((note) => (
@@ -13,7 +13,7 @@ const CardHolder = ({ notes, onDelete, onUpdate, onDone, eye }) => {
           text={note.text}
           onDelete={onDelete}
           onUpdate={onUpdate}
-          onDone={onDone}
+          // onDone={onDone}
           eye={eye}
         />
       ))}
