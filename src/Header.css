@@ -1,0 +1,61 @@
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1.3rem 5rem;
+}
+.logo {
+  cursor: pointer;
+}
+.links {
+  width: 18%;
+}
+.links ul {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.links ul li {
+  cursor: pointer;
+}
+.link {
+  text-decoration: none;
+  color: inherit;
+}
+.active {
+  text-decoration: none;
+  color: inherit;
+  border-bottom: 4px solid rgb(61, 61, 61);
+}
+.links ul li :hover {
+  color: rgb(136, 135, 135);
+}
+@media (max-width: 1300px) {
+  .links {
+    width: 25%;
+  }
+}
+@media (max-width: 1100px) {
+  .nav {
+    margin: 1.3rem 2rem;
+  }
+}
+@media (max-width: 800px) {
+  .links {
+    width: 35%;
+  }
+}
+@media (max-width: 600px) {
+  .nav {
+    font-size: 0.8rem;
+  }
+}
+@media (max-width: 500px) {
+  .links {
+    width: 45%;
+  }
+  .nav {
+    margin: 1.3rem 1rem;
+  }
+}
