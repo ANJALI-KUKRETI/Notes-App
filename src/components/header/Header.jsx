@@ -4,6 +4,8 @@ import { signOut } from "firebase/auth";
 import "./Header.css";
 import { auth } from "../../firebase";
 
+// ====================Hello==================
+
 const Header = () => {
   const logoutHandler = () => {
     signOut(auth);
