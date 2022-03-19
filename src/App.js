@@ -4,10 +4,11 @@ import Layout from "./components/Layout";
 import Header from "./components/header/Header";
 import Palatte from "./components/palatte/Palatte";
 import CardHolder from "./components/cardHolder/CardHolder";
-import { auth, colRef, db } from "./firebase";
+import { auth, db } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import "./App.css";
 import LoginScreen from "./components/LoginScreen";
+import { addNoteToPile } from "./notes/notesApi";
 import {
   onSnapshot,
   addDoc,
@@ -20,57 +21,62 @@ import {
   updateDoc,
   collection,
 } from "firebase/firestore";
-
+import { removeUser, setUser } from "./reducers/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { addNote } from "./reducers/notesSlice";
 function App() {
-  const [user, setUser] = useState(null);
-  let [notes, setNotes] = useState([]);
+  // const [user, setUser] = useState(null);
+  // let [notes, setNotes] = useState([]);
+  const user = useSelector((state) => state.user);
+  const notes = useSelector((state) => state.notes);
+  const dispatch = useDispatch();
+  console.log(notes);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (userAuth) => {
+      if (userAuth) {
+        dispatch(setUser(userAuth.uid));
+      } else {
+        dispatch(setUser(null));
+      }
+    });
+  }, []);
+
+  console.log(user);
   const [complete, setComplete] = useState([]);
 
   const colRef = collection(db, "notes");
 
-  const initials = query(
-    colRef,
-    where("completed", "==", false),
-    where("currentUID", "==", user),
-    orderBy("createdAt", "desc")
-  );
-  const completed = query(
-    colRef,
-    where("completed", "==", true),
-    where("currentUID", "==", user)
-  );
+  // const initials = query(
+  //   colRef,
+  //   where("completed", "==", false),
+  //   where("currentUID", "==", user),
+  //   orderBy("createdAt", "desc")
+  // );
+  // const completed = query(
+  //   colRef,
+  //   where("completed", "==", true),
+  //   where("currentUID", "==", user)
+  // );
 
   useEffect(() => {
     // ===================Adding notes============
-    onSnapshot(initials, (snapshot) => {
-      let fecthNotes = [];
-      snapshot.docs.forEach((doc) => {
-        fecthNotes.push({ ...doc.data(), id: doc.id });
-      });
-      setNotes(fecthNotes);
-    });
-
-    //===================Auth===================
-    onAuthStateChanged(auth, (userAuth) => {
-      if (userAuth) {
-        setUser(userAuth.uid);
-        console.log(userAuth);
-      } else {
-        setUser(null);
-      }
-    });
-
+    // onSnapshot(initials, (snapshot) => {
+    //   let fecthNotes = [];
+    //   snapshot.docs.forEach((doc) => {
+    //     fecthNotes.push({ ...doc.data(), id: doc.id });
+    //   });
+    //   setNotes(fecthNotes);
+    // });
     //=======================completed Notes===========
-    onSnapshot(completed, (snapshot) => {
-      let completedNotes = [];
-      snapshot.docs.forEach((doc) => {
-        completedNotes.push({ ...doc.data(), id: doc.id });
-      });
-      setComplete(completedNotes);
-    });
-  }, [user]);
-
-  // console.log(user);
+    // onSnapshot(completed, (snapshot) => {
+    //   let completedNotes = [];
+    //   snapshot.docs.forEach((doc) => {
+    //     completedNotes.push({ ...doc.data(), id: doc.id });
+    //   });
+    //   setComplete(completedNotes);
+    // });
+  }, []);
 
   const formatDate = () => {
     const d = new Date();
@@ -92,15 +98,24 @@ function App() {
   };
 
   const addNoteHandler = (color) => {
-    addDoc(colRef, {
-      text: "",
-      color,
-      date: formatDate(),
-      completed: false,
-      createdAt: serverTimestamp(),
-      currentUID: user,
-    });
+    dispatch(
+      addNoteToPile({
+        color: color,
+        date: { formatDate },
+        completed: false,
+        createdAt: serverTimestamp(),
+        uid: user.user,
+      })
+    );
   };
+  // addDoc(colRef, {
+  //   text: "",
+  //   color,
+  //   date: formatDate(),
+  //   completed: false,
+  //   createdAt: serverTimestamp(),
+  //   currentUID: user,
+  // });
 
   const deleteNoteHandler = (id) => {
     const docRef = doc(db, "notes", id);
@@ -124,7 +139,7 @@ function App() {
 
   return (
     <>
-      {!user ? (
+      {!user?.user ? (
         <LoginScreen />
       ) : (
         <>
@@ -132,12 +147,13 @@ function App() {
           <Layout>
             <div className="main">
               <Palatte addNote={addNoteHandler} />
+              {/* <Palatte /> */}
               <Routes>
                 <Route
                   path="/"
                   element={
                     <CardHolder
-                      notes={notes}
+                      notes={notes.notes}
                       onDelete={deleteNoteHandler}
                       onUpdate={updateNoteHandler}
                       onDone={updateCompleteNoteHandler}

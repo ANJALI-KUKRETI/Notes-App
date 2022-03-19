@@ -1,52 +1,41 @@
-import { useEffect } from "react";
 import React, { useRef } from "react";
-import { auth, db } from "../firebase";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { useSelector, useDispatch } from "react-redux";
+import { login, signUp } from "../auth/authApi";
 import "./LoginScreen.css";
 
 const LoginScreen = ({ checkUser }) => {
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
 
-  const createUserHandler = () => {
-    createUserWithEmailAndPassword(
-      auth,
-      emailRef.current.value,
-      passwordRef.current.value
-    )
-      .then((cred) => {
-        // checkUser(cred.user);
-        console.log(cred);
+  const { error, status } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
+  const createUserHandler = (event) => {
+    event.preventDefault();
+    dispatch(
+      signUp({
+        email: emailRef.current.value,
+        password: passwordRef.current.value,
       })
-      .catch((err) => {
-        console.log(err.message);
-      });
+    );
   };
   const loginUserHandler = (event) => {
     event.preventDefault();
-    signInWithEmailAndPassword(
-      auth,
-      emailRef.current.value,
-      passwordRef.current.value
-    )
-      .then((cred) => {
-        // checkUser(cred.user);
-        console.log(cred);
+    dispatch(
+      login({
+        email: emailRef.current.value,
+        password: passwordRef.current.value,
       })
-      .catch((err) => {
-        console.log(err);
-      });
+    );
   };
 
   return (
-    <div className="signUp">
-      <form onSubmit={loginUserHandler}>
+    <div className="signUp" onSubmit={loginUserHandler}>
+      <form>
         <h1>Sign In</h1>
         <input type="email" placeholder="Email" ref={emailRef} />
         <input type="password" placeholder="Password" ref={passwordRef} />
+        {error}
         <button type="submit" className="signInBtn">
           Sign In
         </button>
