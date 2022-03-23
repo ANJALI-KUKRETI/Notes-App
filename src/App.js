@@ -8,7 +8,7 @@ import { auth, db } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import "./App.css";
 import LoginScreen from "./components/LoginScreen";
-import { addNoteToPile } from "./notes/notesApi";
+import { addNoteOnFirestore, addNoteToPile } from "./notes/notesApi";
 import {
   onSnapshot,
   addDoc,
@@ -42,7 +42,7 @@ function App() {
     });
   }, []);
 
-  console.log(user);
+  // console.log(user);
   const [complete, setComplete] = useState([]);
 
   const colRef = collection(db, "notes");
@@ -68,7 +68,7 @@ function App() {
     //   });
     //   setNotes(fecthNotes);
     // });
-    //=======================completed Notes===========
+    // //=======================completed Notes===========
     // onSnapshot(completed, (snapshot) => {
     //   let completedNotes = [];
     //   snapshot.docs.forEach((doc) => {
@@ -99,23 +99,15 @@ function App() {
 
   const addNoteHandler = (color) => {
     dispatch(
-      addNoteToPile({
+      addNoteOnFirestore({
         color: color,
-        date: { formatDate },
+        date: formatDate(),
         completed: false,
         createdAt: serverTimestamp(),
         uid: user.user,
       })
     );
   };
-  // addDoc(colRef, {
-  //   text: "",
-  //   color,
-  //   date: formatDate(),
-  //   completed: false,
-  //   createdAt: serverTimestamp(),
-  //   currentUID: user,
-  // });
 
   const deleteNoteHandler = (id) => {
     const docRef = doc(db, "notes", id);

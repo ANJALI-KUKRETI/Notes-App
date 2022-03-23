@@ -1,5 +1,6 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
+// export const addNoteToFirebase = createAsyncThunk();
 const initialState = {
   notes: [],
   status: "loading",
@@ -18,8 +19,18 @@ const notesSlice = createSlice({
   initialState,
   reducers: {
     addNote: (state, action) => {
-      // note = action.payload;
-      state.notes = [action.payload, ...state.notes];
+      const payLoad = action.payload;
+      const newNote = {
+        text: "",
+        color: payLoad.color,
+        date: payLoad.date,
+        completed: payLoad.completed,
+        createdAt: payLoad.createdAt,
+        currentUID: payLoad.currentUID,
+      };
+
+      state.notes = [newNote, ...state.notes];
+      state.status = "idle";
     },
   },
 });
