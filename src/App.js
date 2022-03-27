@@ -8,7 +8,12 @@ import { auth, db } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import "./App.css";
 import LoginScreen from "./components/LoginScreen";
-import { addNoteOnFirestore, addNoteToPile } from "./notes/notesApi";
+import {
+  createNote,
+  getInitials,
+  getNotes,
+  Initials,
+} from "./reducers/notesSlice";
 import {
   onSnapshot,
   addDoc,
@@ -28,11 +33,10 @@ function App() {
   // const [user, setUser] = useState(null);
   // let [notes, setNotes] = useState([]);
   const user = useSelector((state) => state.user);
-  const notes = useSelector((state) => state.notes);
+  const notes = useSelector(getNotes);
   const dispatch = useDispatch();
-  console.log(notes);
 
-  useEffect(() => {
+  useEffect(async () => {
     onAuthStateChanged(auth, (userAuth) => {
       if (userAuth) {
         dispatch(setUser(userAuth.uid));
@@ -40,8 +44,13 @@ function App() {
         dispatch(setUser(null));
       }
     });
+    const getInitialNotes = (user) => {
+      dispatch(getInitials({ user: user }));
+    };
+    console.log(user.user);
+    getInitialNotes(user.user);
   }, []);
-
+  console.log(user.user);
   // console.log(user);
   const [complete, setComplete] = useState([]);
 
@@ -66,7 +75,7 @@ function App() {
     //   snapshot.docs.forEach((doc) => {
     //     fecthNotes.push({ ...doc.data(), id: doc.id });
     //   });
-    //   setNotes(fecthNotes);
+    //   notes = fecthNotes;
     // });
     // //=======================completed Notes===========
     // onSnapshot(completed, (snapshot) => {
@@ -99,7 +108,7 @@ function App() {
 
   const addNoteHandler = (color) => {
     dispatch(
-      addNoteOnFirestore({
+      createNote({
         color: color,
         date: formatDate(),
         completed: false,
@@ -110,8 +119,8 @@ function App() {
   };
 
   const deleteNoteHandler = (id) => {
-    const docRef = doc(db, "notes", id);
-    deleteDoc(docRef);
+    console.log(id);
+    // dispatch(deleteNoteFromFire({ id: id }));
   };
   const updateNoteHandler = (text, id) => {
     const docRef = doc(db, "notes", id);
