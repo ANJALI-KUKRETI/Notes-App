@@ -15,8 +15,6 @@ import {
   getNotes,
 } from "./reducers/notesSlice";
 import {
-  onSnapshot,
-  addDoc,
   deleteDoc,
   doc,
   query,
@@ -35,6 +33,9 @@ function App() {
   const initials = useSelector(getInitialNotes);
   const dispatch = useDispatch();
 
+  // Should be notes.initials
+  console.log(notes.initials);
+
   useEffect(async () => {
     onAuthStateChanged(auth, (userAuth) => {
       if (userAuth) {
@@ -44,35 +45,14 @@ function App() {
       }
     });
   }, []);
+
   useEffect(() => {
-    const getInitialNotes = (user) => {
-      dispatch(getInitials({ user: user }));
-    };
-    // console.log(user.user);
-    getInitialNotes(user.user);
-  }, []);
+    if (user.user !== undefined) {
+      dispatch(getInitials(user));
+    }
+    // user should be passed into this array since user's state will change on mount
+  }, [user]);
   const [complete, setComplete] = useState([]);
-
-  const colRef = collection(db, "notes");
-
-  useEffect(() => {
-    // ===================Adding notes============
-    // onSnapshot(initials, (snapshot) => {
-    // let fecthNotes = [];
-    //   snapshot.docs.forEach((doc) => {
-    //     fecthNotes.push({ ...doc.data(), id: doc.id });
-    //   });
-    //   notes = fecthNotes;
-    // });
-    // //=======================completed Notes===========
-    // onSnapshot(completed, (snapshot) => {
-    //   let completedNotes = [];
-    //   snapshot.docs.forEach((doc) => {
-    //     completedNotes.push({ ...doc.data(), id: doc.id });
-    //   });
-    //   setComplete(completedNotes);
-    // });
-  }, []);
 
   const formatDate = () => {
     const d = new Date();
@@ -127,7 +107,6 @@ function App() {
       completed: true,
     });
   };
-  // console.log(notes);
   return (
     <>
       {!user?.user ? (
@@ -143,7 +122,7 @@ function App() {
                   path="/"
                   element={
                     <CardHolder
-                      notes={notes.notes}
+                      notes={notes.initials}
                       onDelete={deleteNoteHandler}
                       onUpdate={updateNoteHandler}
                       onDone={updateCompleteNoteHandler}

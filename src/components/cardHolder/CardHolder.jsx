@@ -3,14 +3,12 @@ import Card from "./Card";
 import "./CardHolder.css";
 
 const CardHolder = ({ notes, onDelete, onUpdate, onDone, eye }) => {
-  // console.log(notes);
   const newarr = [...notes];
-  // console.log(newarr);
   return (
     <div className="cardHolder">
-      {newarr.map((note) => (
+      {newarr.map((note, i) => (
         <Card
-          key={note.id}
+          key={i}
           note={note}
           text={note.text}
           onDelete={onDelete}

@@ -3,12 +3,15 @@ import { collection, getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC9Mb8h0XILZ4TtIPaTORLEpgRNmBQoRRQ",
-  authDomain: "notes-taking-app-2e16a.firebaseapp.com",
-  projectId: "notes-taking-app-2e16a",
-  storageBucket: "notes-taking-app-2e16a.appspot.com",
-  messagingSenderId: "296389316236",
-  appId: "1:296389316236:web:8efd994e094bd5ee4c35a9",
+  apiKey: "AIzaSyBb_CUwiB8JoShlChssboEXod50uDi7HkQ",
+  authDomain: "test-3314c.firebaseapp.com",
+  databaseURL:
+    "https://test-3314c-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "test-3314c",
+  storageBucket: "test-3314c.appspot.com",
+  messagingSenderId: "856127194897",
+  appId: "1:856127194897:web:f1b1bba06a0a74385aeeb0",
+  measurementId: "G-VWSWWGVB9V",
 };
 
 const app = initializeApp(firebaseConfig);
