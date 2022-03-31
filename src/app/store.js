@@ -7,4 +7,8 @@ export const store = configureStore({
     user: userReducer,
     notes: notesReducer,
   },
+  middleware: (middleware) =>
+    middleware({
+      serializableCheck: false,
+    }),
 });
