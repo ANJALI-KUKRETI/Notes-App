@@ -12,6 +12,7 @@ import {
   updateDoc,
   collection,
 } from "firebase/firestore";
+import { async } from "@firebase/util";
 // import { createNote } from "../notes/notesApi";
 const colRef = collection(db, "notes");
 
@@ -37,23 +38,22 @@ export const createNote = createAsyncThunk(
 export const getInitials = createAsyncThunk(
   "notes/initials",
   async ({ user }) => {
-    console.log(user);
+    // console.log(user);
     const init = query(
       colRef,
       where("completed", "==", false),
       where("currentUID", "==", user),
       orderBy("createdAt", "desc")
     );
-    console.log(init);
-    // return init;
-    const initialNotes = [];
+    let initialNotes = [];
     onSnapshot(init, (snapshot) => {
-      let fecthNotes = [];
+      let fetchNotes = [];
       snapshot.docs.forEach((doc) => {
-        fecthNotes.push({ ...doc.data(), id: doc.id });
-        console.log(fecthNotes);
-        initialNotes = fecthNotes;
+        fetchNotes.push({ ...doc.data(), id: doc.id });
+        // console.log(fetchNotes);
       });
+      initialNotes = [...fetchNotes];
+      console.log(initialNotes);
     });
     console.log(initialNotes);
     return initialNotes;
@@ -69,16 +69,18 @@ const notesSlice = createSlice({
   name: "notes",
   initialState,
   reducers: {},
-  extraReducers: {
-    [createNote.fulfilled]: (state, { payload }) => {
-      return { ...state, notes: [...state.notes, payload] };
-    },
-    [getInitials.fulfilled]: (state, { payload }) => {
-      console.log(payload);
-      return { ...state, initials: [payload] };
-    },
+  extraReducers: (builder) => {
+    builder
+      .addCase(createNote.fulfilled, (state, { payload }) => {
+        state.notes = [payload, ...state.notes];
+      })
+      .addCase(getInitials.fulfilled, (state, { payload }) => {
+        state.initials = [...payload];
+        console.log(payload);
+        console.log(state.initials);
+      });
   },
 });
 export const getNotes = (state) => state.notes;
-export const Initials = (state) => state.initials;
+export const getInitialNotes = (state) => state.initials;
 export default notesSlice.reducer;

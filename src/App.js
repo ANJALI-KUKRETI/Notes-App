@@ -11,8 +11,8 @@ import LoginScreen from "./components/LoginScreen";
 import {
   createNote,
   getInitials,
+  getInitialNotes,
   getNotes,
-  Initials,
 } from "./reducers/notesSlice";
 import {
   onSnapshot,
@@ -30,10 +30,9 @@ import { removeUser, setUser } from "./reducers/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { addNote } from "./reducers/notesSlice";
 function App() {
-  // const [user, setUser] = useState(null);
-  // let [notes, setNotes] = useState([]);
   const user = useSelector((state) => state.user);
   const notes = useSelector(getNotes);
+  const initials = useSelector(getInitialNotes);
   const dispatch = useDispatch();
 
   useEffect(async () => {
@@ -44,34 +43,22 @@ function App() {
         dispatch(setUser(null));
       }
     });
+  }, []);
+  useEffect(() => {
     const getInitialNotes = (user) => {
       dispatch(getInitials({ user: user }));
     };
-    console.log(user.user);
+    // console.log(user.user);
     getInitialNotes(user.user);
   }, []);
-  console.log(user.user);
-  // console.log(user);
   const [complete, setComplete] = useState([]);
 
   const colRef = collection(db, "notes");
 
-  // const initials = query(
-  //   colRef,
-  //   where("completed", "==", false),
-  //   where("currentUID", "==", user),
-  //   orderBy("createdAt", "desc")
-  // );
-  // const completed = query(
-  //   colRef,
-  //   where("completed", "==", true),
-  //   where("currentUID", "==", user)
-  // );
-
   useEffect(() => {
     // ===================Adding notes============
     // onSnapshot(initials, (snapshot) => {
-    //   let fecthNotes = [];
+    // let fecthNotes = [];
     //   snapshot.docs.forEach((doc) => {
     //     fecthNotes.push({ ...doc.data(), id: doc.id });
     //   });
@@ -114,6 +101,7 @@ function App() {
         completed: false,
         createdAt: serverTimestamp(),
         uid: user.user,
+        // id: Math.random(),
       })
     );
   };
@@ -123,7 +111,9 @@ function App() {
     // dispatch(deleteNoteFromFire({ id: id }));
   };
   const updateNoteHandler = (text, id) => {
+    console.log(id);
     const docRef = doc(db, "notes", id);
+    console.log(docRef);
     updateDoc(docRef, {
       text,
     }).then(() => {
@@ -137,7 +127,7 @@ function App() {
       completed: true,
     });
   };
-
+  // console.log(notes);
   return (
     <>
       {!user?.user ? (
@@ -148,7 +138,6 @@ function App() {
           <Layout>
             <div className="main">
               <Palatte addNote={addNoteHandler} />
-              {/* <Palatte /> */}
               <Routes>
                 <Route
                   path="/"

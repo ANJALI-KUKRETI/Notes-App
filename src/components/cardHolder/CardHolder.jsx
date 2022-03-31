@@ -10,7 +10,7 @@ const CardHolder = ({ notes, onDelete, onUpdate, onDone, eye }) => {
     <div className="cardHolder">
       {newarr.map((note) => (
         <Card
-          key={Math.random()}
+          key={note.id}
           note={note}
           text={note.text}
           onDelete={onDelete}

@@ -5,8 +5,11 @@ import { AiFillDelete } from "react-icons/ai";
 import { BsFillPinAngleFill } from "react-icons/bs";
 
 const Card = ({ eye, note, onDelete, onUpdate, onDone }) => {
+  console.log(note.id);
   const updateText = (text) => {
     onUpdate(text, note.id);
+    // console.log("hello");
+    console.log(text);
   };
 
   return (
