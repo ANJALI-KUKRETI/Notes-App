@@ -50,6 +50,7 @@ function App() {
     if (user.user !== undefined) {
       dispatch(getInitials(user));
     }
+    // user should be passed into this array since user's state will change on mount
   }, [user]);
   const [complete, setComplete] = useState([]);
 
