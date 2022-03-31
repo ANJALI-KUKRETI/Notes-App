@@ -7,8 +7,6 @@ import { BsFillPinAngleFill } from "react-icons/bs";
 const Card = ({ eye, note, onDelete, onUpdate, onDone }) => {
   const updateText = (text) => {
     onUpdate(text, note.id);
-    // console.log("hello");
-    console.log(text);
   };
 
   return (
