@@ -32,6 +32,7 @@ import { addNote } from "./reducers/notesSlice";
 function App() {
   const user = useSelector((state) => state.user);
   const notes = useSelector(getNotes);
+  console.log(notes);
   const initials = useSelector(getInitialNotes);
   const dispatch = useDispatch();
 
@@ -48,7 +49,7 @@ function App() {
     const getInitialNotes = (user) => {
       dispatch(getInitials({ user: user }));
     };
-    // console.log(user.user);
+    console.log(user.user);
     getInitialNotes(user.user);
   }, []);
   const [complete, setComplete] = useState([]);

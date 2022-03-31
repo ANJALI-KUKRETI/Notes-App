@@ -59,7 +59,7 @@ export const getInitials = createAsyncThunk(
     return initialNotes;
   }
 );
-const initialState = {
+export const initialState = {
   notes: [],
   initials: [],
   status: "loading",
