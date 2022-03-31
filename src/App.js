@@ -46,15 +46,18 @@ function App() {
     });
   }, []);
   useEffect(() => {
-    const getInitialNotes = (user) => {
-      dispatch(getInitials({ user: user }));
-    };
-    console.log(user.user);
-    getInitialNotes(user.user);
-  }, []);
+    // const getInitialNotes = (user) => {
+    //   dispatch(getInitials({ user: user }));
+    // };
+    // console.log(user.user);
+    // getInitialNotes(user.user);
+    if (user.user !== undefined) {
+      dispatch(getInitials(user));
+    }
+  }, [user]);
   const [complete, setComplete] = useState([]);
 
-  const colRef = collection(db, "notes");
+  // const colRef = collection(db, "notes");
 
   useEffect(() => {
     // ===================Adding notes============
@@ -144,7 +147,7 @@ function App() {
                   path="/"
                   element={
                     <CardHolder
-                      notes={notes.notes}
+                      notes={notes.initials}
                       onDelete={deleteNoteHandler}
                       onUpdate={updateNoteHandler}
                       onDone={updateCompleteNoteHandler}
