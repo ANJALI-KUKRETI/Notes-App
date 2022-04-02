@@ -6,6 +6,7 @@ import { BsFillPinAngleFill } from "react-icons/bs";
 
 const Card = ({ eye, note, onDelete, onUpdate, onDone }) => {
   const updateText = (text) => {
+    console.log(text);
     onUpdate(text, note.id);
   };
 
@@ -31,7 +32,9 @@ const Card = ({ eye, note, onDelete, onUpdate, onDone }) => {
           <div className="functionality">
             {eye && (
               <div className="hide">
-                <BsCheckSquareFill onClick={() => onDone(note.id)} />
+                <BsCheckSquareFill
+                  onClick={() => onDone(note.id, note.currentUID)}
+                />
               </div>
             )}
             <div className="delete">

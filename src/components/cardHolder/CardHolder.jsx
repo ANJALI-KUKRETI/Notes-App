@@ -6,9 +6,9 @@ const CardHolder = ({ notes, onDelete, onUpdate, onDone, eye }) => {
   const newarr = [...notes];
   return (
     <div className="cardHolder">
-      {newarr.map((note, i) => (
+      {newarr.map((note) => (
         <Card
-          key={i}
+          key={note.id}
           note={note}
           text={note.text}
           onDelete={onDelete}

@@ -1,125 +1,39 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Header from "./components/header/Header";
 import Palatte from "./components/palatte/Palatte";
 import CardHolder from "./components/cardHolder/CardHolder";
-import { auth, db } from "./firebase";
-import { onAuthStateChanged } from "firebase/auth";
 import "./App.css";
 import LoginScreen from "./components/LoginScreen";
-import {
-  createNote,
-  getInitials,
-  getInitialNotes,
-  getNotes,
-} from "./reducers/notesSlice";
-import {
-  deleteDoc,
-  doc,
-  query,
-  where,
-  orderBy,
-  serverTimestamp,
-  updateDoc,
-  collection,
-} from "firebase/firestore";
-import { removeUser, setUser } from "./reducers/authSlice";
+import { getCompleted, getInitials } from "./reducers/notesSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { addNote } from "./reducers/notesSlice";
+import useFetchUser from "./hooks/fetch-user";
+import useNotesFirestore from "./hooks/notes";
+
 function App() {
   const user = useSelector((state) => state.user);
-  const notes = useSelector(getNotes);
-  console.log(notes);
-  const initials = useSelector(getInitialNotes);
+  const notes = useSelector((state) => state.notes);
   const dispatch = useDispatch();
 
-  // Should be notes.initials
-  console.log(notes.initials);
+  // Moved the whole code block to a new custom hook
+  useFetchUser();
 
-  useEffect(async () => {
-    onAuthStateChanged(auth, (userAuth) => {
-      if (userAuth) {
-        dispatch(setUser(userAuth.uid));
-      } else {
-        dispatch(setUser(null));
-      }
-    });
-  }, []);
+  // Abstracted away all the functions into another custom hook
+  const {
+    addNoteHandler,
+    deleteNoteHandler,
+    updateNoteHandler,
+    updateCompleteNoteHandler,
+  } = useNotesFirestore();
+
   useEffect(() => {
-    // const getInitialNotes = (user) => {
-    //   dispatch(getInitials({ user: user }));
-    // };
-    // console.log(user.user);
-    // getInitialNotes(user.user);
-    if (user.user !== undefined) {
+    if (user.user !== undefined && user.user !== null) {
       dispatch(getInitials(user));
+      dispatch(getCompleted(user));
     }
   }, [user]);
 
-  // const colRef = collection(db, "notes");
-
-  useEffect(() => {
-    if (user.user !== undefined) {
-      dispatch(getInitials(user));
-    }
-    // user should be passed into this array since user's state will change on mount
-  }, [user]);
-  const [complete, setComplete] = useState([]);
-
-  const formatDate = () => {
-    const d = new Date();
-    const date = d.getDate();
-    let nDate, nMonth;
-    if (date > 9) {
-      nDate = date;
-    } else {
-      nDate = `0${date}`;
-    }
-    const month = d.getMonth() + 1;
-    if (month > 9) {
-      nMonth = month;
-    } else {
-      nMonth = `0${month}`;
-    }
-    const year = d.getFullYear();
-    return `${nDate}/${nMonth}/${year}`;
-  };
-
-  const addNoteHandler = (color) => {
-    dispatch(
-      createNote({
-        color: color,
-        date: formatDate(),
-        completed: false,
-        createdAt: serverTimestamp(),
-        uid: user.user,
-        // id: Math.random(),
-      })
-    );
-  };
-
-  const deleteNoteHandler = (id) => {
-    console.log(id);
-    // dispatch(deleteNoteFromFire({ id: id }));
-  };
-  const updateNoteHandler = (text, id) => {
-    console.log(id);
-    const docRef = doc(db, "notes", id);
-    console.log(docRef);
-    updateDoc(docRef, {
-      text,
-    }).then(() => {
-      console.log("updated");
-    });
-  };
-
-  const updateCompleteNoteHandler = (id) => {
-    const docRef = doc(db, "notes", id);
-    updateDoc(docRef, {
-      completed: true,
-    });
-  };
   return (
     <>
       {!user?.user ? (
@@ -147,7 +61,7 @@ function App() {
                   path="/complete"
                   element={
                     <CardHolder
-                      notes={complete}
+                      notes={notes.completed}
                       onDelete={deleteNoteHandler}
                       onUpdate={updateNoteHandler}
                       eye={false}

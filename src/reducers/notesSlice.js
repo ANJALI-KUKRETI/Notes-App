@@ -1,27 +1,23 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { auth, db } from "../firebase";
+import { db } from "../firebase";
 import {
-  onSnapshot,
-  addDoc,
+  query,
+  collection,
+  getDocs,
+  setDoc,
+  getDoc,
   deleteDoc,
   doc,
-  query,
   where,
-  orderBy,
-  serverTimestamp,
   updateDoc,
-  collection,
-  getDoc,
-  getDocs,
 } from "firebase/firestore";
-import { async } from "@firebase/util";
-// import { createNote } from "../notes/notesApi";
-const colRef = collection(db, "notes");
+import { v4 as uuidv4 } from "uuid";
 
 export const createNote = createAsyncThunk(
   "notes/setNotes",
   async ({ color, date, completed, createdAt, uid }) => {
     try {
+      const id = uuidv4();
       const note = {
         text: "",
         color,
@@ -29,46 +25,69 @@ export const createNote = createAsyncThunk(
         completed,
         createdAt,
         currentUID: uid,
+        id: id,
       };
-      addDoc(colRef, note);
-      return note;
+      await setDoc(doc(db, `notes/${id}`), note);
+      const res = await getDoc(doc(db, "notes", id));
+      console.log(res.data());
+      return res.data();
     } catch (err) {
       return err.message;
     }
   }
 );
+
 export const getInitials = createAsyncThunk(
   "notes/initials",
   async ({ user }) => {
     const init = query(
-      colRef,
-      where("completed", "==", false),
+      collection(db, "notes"),
       where("currentUID", "==", user),
-      orderBy("createdAt", "desc")
+      where("completed", "==", false)
     );
     const res = await getDocs(init);
-    console.log(res.docs);
-    return res;
-    //  onSnapshot(init, (snapshot) => {
-    //   let fetchNotes = [];
-    //   snapshot.docs.forEach((doc) => {
-    //     fetchNotes.push({ ...doc.data(), id: doc.id });
-    //     // console.log(fetchNotes);
-    //   });
-    //   console.log(fetchNotes);
-    //   return fetchNotes;
-    // });
-    // return res;
-    // console.log(initialNotes);
-    // return initialNotes;
-    // This one is much leaner than onSnapShot
-    // const init = query(colRef);
-    // const res = await getDocs(init);
     return res;
   }
 );
+
+export const deleteNote = createAsyncThunk("notes/deleteNote", async (id) => {
+  const docRef = doc(db, "notes", id);
+  await deleteDoc(docRef);
+  return id;
+});
+
+export const completeNote = createAsyncThunk(
+  "notes/completeNote",
+  async ({ id, user }) => {
+    const docRef = doc(db, "notes", id);
+    await updateDoc(docRef, {
+      completed: true,
+    });
+    const init = query(
+      collection(db, "notes"),
+      where("currentUID", "==", user),
+      where("completed", "==", true)
+    );
+    const res = await getDocs(init);
+    return { res, id };
+  }
+);
+export const getCompleted = createAsyncThunk(
+  "notes/getCompleted",
+  async ({ user }) => {
+    const init = query(
+      collection(db, "notes"),
+      where("currentUID", "==", user),
+      where("completed", "==", true)
+    );
+    const res = await getDocs(init);
+    return res;
+  }
+);
+
 export const initialState = {
   initials: [],
+  completed: [],
   status: "loading",
 };
 
@@ -79,21 +98,27 @@ const notesSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(createNote.fulfilled, (state, { payload }) => {
-        state.notes = [payload, ...state.notes];
+        console.log(payload);
+        state.initials = [payload, ...state.initials];
       })
-      // .addCase(getInitials.fulfilled, (state, action) => {
-      //   console.log(action);
-      // state.initials = [...payload];
-      // console.log(payload);
-      // console.log(state.initials);
-      // });
       .addCase(getInitials.fulfilled, (state, { payload }) => {
-        // This is where things were going wrong for you.
         const res = payload.docs.map((d) => d.data());
         state.initials = res;
+      })
+      .addCase(deleteNote.fulfilled, (state, { payload }) => {
+        state.initials = state.initials.filter((init) => init.id !== payload);
+        state.completed = state.completed.filter((init) => init.id !== payload);
+      })
+      .addCase(completeNote.fulfilled, (state, { payload }) => {
+        const { res, id } = payload;
+        state.initials = state.initials.filter((init) => init.id !== id);
+        state.completed = res.docs.map((d) => d.data());
+      })
+      .addCase(getCompleted.fulfilled, (state, { payload }) => {
+        state.completed = payload.docs.map((d) => d.data());
+        console.log(state.completed);
       });
   },
 });
-// export const getNotes = (state) => state.notes;
-export const getInitialNotes = (state) => state.initials;
+
 export default notesSlice.reducer;

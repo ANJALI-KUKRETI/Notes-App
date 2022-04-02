@@ -7,6 +7,7 @@ import { auth } from "../../firebase";
 const Header = () => {
   const logoutHandler = () => {
     signOut(auth);
+    window.location.reload();
   };
   return (
     <div className="nav">
