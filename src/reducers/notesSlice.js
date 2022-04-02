@@ -40,15 +40,15 @@ export const createNote = createAsyncThunk(
 export const getInitials = createAsyncThunk(
   "notes/initials",
   async ({ user }) => {
-    // const init = query(
-    //   colRef,
-    //   where("completed", "==", false),
-    //   where("currentUID", "==", user),
-    //   orderBy("createdAt", "desc")
-    // );
-    // const res = await getDocs(init);
-    // console.log(res.docs);
-    // return res;
+    const init = query(
+      colRef,
+      where("completed", "==", false),
+      where("currentUID", "==", user),
+      orderBy("createdAt", "desc")
+    );
+    const res = await getDocs(init);
+    console.log(res.docs);
+    return res;
     //  onSnapshot(init, (snapshot) => {
     //   let fetchNotes = [];
     //   snapshot.docs.forEach((doc) => {
@@ -62,13 +62,12 @@ export const getInitials = createAsyncThunk(
     // console.log(initialNotes);
     // return initialNotes;
     // This one is much leaner than onSnapShot
-    const init = query(colRef);
-    const res = await getDocs(init);
+    // const init = query(colRef);
+    // const res = await getDocs(init);
     return res;
   }
 );
 export const initialState = {
-  notes: [],
   initials: [],
   status: "loading",
 };
@@ -95,6 +94,6 @@ const notesSlice = createSlice({
       });
   },
 });
-export const getNotes = (state) => state.notes;
+// export const getNotes = (state) => state.notes;
 export const getInitialNotes = (state) => state.initials;
 export default notesSlice.reducer;
