@@ -10,13 +10,12 @@ const firebaseConfig = {
   projectId: "test-3314c",
   storageBucket: "test-3314c.appspot.com",
   messagingSenderId: "856127194897",
-  appId: "1:856127194897:web:f1b1bba06a0a74385aeeb0",
-  measurementId: "G-VWSWWGVB9V",
+  appId: "1:856127194897:web:1e917e31d928576d5aeeb0",
+  measurementId: "G-JKQKCWS36M",
 };
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth();
-// export const colRef = collection(db, "notes");
 
 export default app;

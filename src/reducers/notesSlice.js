@@ -1,27 +1,21 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { auth, db } from "../firebase";
+import { db } from "../firebase";
 import {
-  onSnapshot,
-  addDoc,
-  deleteDoc,
-  doc,
   query,
-  where,
-  orderBy,
-  serverTimestamp,
-  updateDoc,
   collection,
-  getDoc,
   getDocs,
+  setDoc,
+  getDoc,
+  doc,
+  where,
 } from "firebase/firestore";
-import { async } from "@firebase/util";
-// import { createNote } from "../notes/notesApi";
-const colRef = collection(db, "notes");
+import { v4 as uuidv4 } from "uuid";
 
 export const createNote = createAsyncThunk(
   "notes/setNotes",
   async ({ color, date, completed, createdAt, uid }) => {
     try {
+      const id = uuidv4();
       const note = {
         text: "",
         color,
@@ -29,9 +23,11 @@ export const createNote = createAsyncThunk(
         completed,
         createdAt,
         currentUID: uid,
+        id: id,
       };
-      addDoc(colRef, note);
-      return note;
+      await setDoc(doc(db, `notes/${id}`), note);
+      const res = await getDoc(doc(db, "notes", id));
+      return res.data();
     } catch (err) {
       return err.message;
     }
@@ -40,35 +36,16 @@ export const createNote = createAsyncThunk(
 export const getInitials = createAsyncThunk(
   "notes/initials",
   async ({ user }) => {
-    // const init = query(
-    //   colRef,
-    //   where("completed", "==", false),
-    //   where("currentUID", "==", user),
-    //   orderBy("createdAt", "desc")
-    // );
-    // const res = await getDocs(init);
-    // console.log(res.docs);
-    // return res;
-    //  onSnapshot(init, (snapshot) => {
-    //   let fetchNotes = [];
-    //   snapshot.docs.forEach((doc) => {
-    //     fetchNotes.push({ ...doc.data(), id: doc.id });
-    //     // console.log(fetchNotes);
-    //   });
-    //   console.log(fetchNotes);
-    //   return fetchNotes;
-    // });
-    // return res;
-    // console.log(initialNotes);
-    // return initialNotes;
-    // This one is much leaner than onSnapShot
-    const init = query(colRef);
+    const init = query(
+      collection(db, "notes"),
+      where("currentUID", "==", user),
+      where("completed", "==", false)
+    );
     const res = await getDocs(init);
     return res;
   }
 );
 export const initialState = {
-  notes: [],
   initials: [],
   status: "loading",
 };
@@ -80,21 +57,15 @@ const notesSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(createNote.fulfilled, (state, { payload }) => {
-        state.notes = [payload, ...state.notes];
+        state.initials = [payload, ...state.initials];
       })
-      // .addCase(getInitials.fulfilled, (state, action) => {
-      //   console.log(action);
-      // state.initials = [...payload];
-      // console.log(payload);
-      // console.log(state.initials);
-      // });
+
       .addCase(getInitials.fulfilled, (state, { payload }) => {
-        // This is where things were going wrong for you.
         const res = payload.docs.map((d) => d.data());
         state.initials = res;
       });
   },
 });
-export const getNotes = (state) => state.notes;
+
 export const getInitialNotes = (state) => state.initials;
 export default notesSlice.reducer;
