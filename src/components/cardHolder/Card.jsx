@@ -1,14 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import "./CardHolder.css";
 import { BsCheckSquareFill } from "react-icons/bs";
 import { AiFillDelete } from "react-icons/ai";
 import { BsFillPinAngleFill } from "react-icons/bs";
 
 const Card = ({ eye, note, onDelete, onUpdate, onDone }) => {
-  const updateText = (text) => {
-    console.log(text);
-    onUpdate(text, note.id);
-  };
+  const [cardText, setCardText] = useState(note.text);
 
   return (
     <>
@@ -24,8 +21,8 @@ const Card = ({ eye, note, onDelete, onUpdate, onDone }) => {
         <textarea
           type="text"
           className="cardInput"
-          onChange={(event) => updateText(event.target.value)}
-          value={note.text}
+          onChange={(event) => setCardText(event.target.value)}
+          value={cardText}
         />
         <div className="lower">
           <div className="date">{note.date}</div>
@@ -33,7 +30,7 @@ const Card = ({ eye, note, onDelete, onUpdate, onDone }) => {
             {eye && (
               <div className="hide">
                 <BsCheckSquareFill
-                  onClick={() => onDone(note.id, note.currentUID)}
+                  onClick={() => onUpdate(cardText, note.id)}
                 />
               </div>
             )}
