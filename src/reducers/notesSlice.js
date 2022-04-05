@@ -11,6 +11,7 @@ import {
   where,
   orderBy,
   updateDoc,
+  orderBy,
 } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 import { async } from "@firebase/util";
@@ -128,6 +129,9 @@ const notesSlice = createSlice({
       .addCase(getInitials.fulfilled, (state, { payload }) => {
         const res = payload.docs.map((d) => d.data());
         state.initials = res;
+      })
+      .addCase(getInitials.rejected, (state, action) => {
+        console.log(action);
       })
       .addCase(deleteNote.fulfilled, (state, { payload }) => {
         state.initials = state.initials.filter((init) => init.id !== payload);

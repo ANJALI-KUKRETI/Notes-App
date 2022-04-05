@@ -11,6 +11,7 @@ const Card = ({ eye, note, onDelete, onUpdate, onDone }) => {
     setCardText(text);
     onUpdate(text, note.id);
   };
+
   return (
     <>
       <div
@@ -34,7 +35,7 @@ const Card = ({ eye, note, onDelete, onUpdate, onDone }) => {
             {eye && (
               <div className="hide">
                 <BsCheckSquareFill
-                  onClick={() => onDone(note.id, note.currentUID)}
+                  onClick={() => onUpdate(cardText, note.id)}
                 />
               </div>
             )}
