@@ -6,9 +6,8 @@ import {
   createNote,
   deleteNote,
   getCompleted,
+  updateNote,
 } from "../reducers/notesSlice";
-import { db } from "../firebase";
-import { doc, updateDoc, deleteDoc } from "firebase/firestore";
 
 export default function useNotesFirestore() {
   const user = useSelector((state) => state.user);
@@ -31,13 +30,7 @@ export default function useNotesFirestore() {
   };
 
   const updateNoteHandler = (text, id) => {
-    console.log(text);
-    const docRef = doc(db, "notes", id);
-    updateDoc(docRef, {
-      text,
-    }).then(() => {
-      console.log("updated");
-    });
+    dispatch(updateNote({ text: text, id: id }));
   };
 
   const updateCompleteNoteHandler = (id, user) => {

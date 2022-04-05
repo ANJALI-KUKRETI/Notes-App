@@ -9,9 +9,13 @@ import {
   deleteDoc,
   doc,
   where,
+  orderBy,
   updateDoc,
 } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
+import { async } from "@firebase/util";
+
+// ===========================Create new note======================
 
 export const createNote = createAsyncThunk(
   "notes/setNotes",
@@ -37,25 +41,29 @@ export const createNote = createAsyncThunk(
   }
 );
 
+// ========================get initial notes========================
 export const getInitials = createAsyncThunk(
   "notes/initials",
   async ({ user }) => {
     const init = query(
       collection(db, "notes"),
       where("currentUID", "==", user),
-      where("completed", "==", false)
+      where("completed", "==", false),
+      orderBy("createdAt", "desc")
     );
     const res = await getDocs(init);
     return res;
   }
 );
 
+// =========================Delete Note==============================
 export const deleteNote = createAsyncThunk("notes/deleteNote", async (id) => {
   const docRef = doc(db, "notes", id);
   await deleteDoc(docRef);
   return id;
 });
 
+// ===============================Set completed===================
 export const completeNote = createAsyncThunk(
   "notes/completeNote",
   async ({ id, user }) => {
@@ -66,12 +74,15 @@ export const completeNote = createAsyncThunk(
     const init = query(
       collection(db, "notes"),
       where("currentUID", "==", user),
-      where("completed", "==", true)
+      where("completed", "==", true),
+      orderBy("createdAt", "desc")
     );
     const res = await getDocs(init);
     return { res, id };
   }
 );
+
+// =========================Get completed=======================
 export const getCompleted = createAsyncThunk(
   "notes/getCompleted",
   async ({ user }) => {
@@ -82,6 +93,19 @@ export const getCompleted = createAsyncThunk(
     );
     const res = await getDocs(init);
     return res;
+  }
+);
+
+// =========================Update text========================
+export const updateNote = createAsyncThunk(
+  "notes/updateNotes",
+  async ({ text, id }) => {
+    const docRef = doc(db, "notes", id);
+    updateDoc(docRef, {
+      text: text,
+    }).then(() => {});
+    console.log(docRef);
+    return { text, docRef };
   }
 );
 
@@ -116,8 +140,10 @@ const notesSlice = createSlice({
       })
       .addCase(getCompleted.fulfilled, (state, { payload }) => {
         state.completed = payload.docs.map((d) => d.data());
-        console.log(state.completed);
       });
+    // .addCase(updateNote.fulfilled, (state, { payload }) => {
+    //   console.log(state.initials);
+    // });
   },
 });
 

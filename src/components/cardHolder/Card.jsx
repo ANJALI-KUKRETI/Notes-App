@@ -1,15 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import "./CardHolder.css";
 import { BsCheckSquareFill } from "react-icons/bs";
 import { AiFillDelete } from "react-icons/ai";
 import { BsFillPinAngleFill } from "react-icons/bs";
 
 const Card = ({ eye, note, onDelete, onUpdate, onDone }) => {
+  const [cardText, setCardText] = useState(note.text);
   const updateText = (text) => {
-    console.log(text);
+    // console.log(text, note.id);
+    setCardText(text);
     onUpdate(text, note.id);
   };
-
   return (
     <>
       <div
@@ -25,7 +26,7 @@ const Card = ({ eye, note, onDelete, onUpdate, onDone }) => {
           type="text"
           className="cardInput"
           onChange={(event) => updateText(event.target.value)}
-          value={note.text}
+          value={cardText}
         />
         <div className="lower">
           <div className="date">{note.date}</div>
