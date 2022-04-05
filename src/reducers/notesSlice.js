@@ -11,7 +11,6 @@ import {
   where,
   orderBy,
   updateDoc,
-  orderBy,
 } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 import { async } from "@firebase/util";
@@ -114,6 +113,7 @@ export const initialState = {
   initials: [],
   completed: [],
   status: "loading",
+  err: null,
 };
 
 const notesSlice = createSlice({
@@ -125,29 +125,56 @@ const notesSlice = createSlice({
       .addCase(createNote.fulfilled, (state, { payload }) => {
         console.log(payload);
         state.initials = [payload, ...state.initials];
+        state.status = "idle";
+        state.err = null;
+      })
+      .addCase(createNote.rejected, (state) => {
+        state.err = "Some error occured";
+        state.status = "idle";
       })
       .addCase(getInitials.fulfilled, (state, { payload }) => {
         const res = payload.docs.map((d) => d.data());
         state.initials = res;
+        state.status = "idle";
+        state.err = null;
       })
-      .addCase(getInitials.rejected, (state, action) => {
-        console.log(action);
+      .addCase(getInitials.rejected, (state) => {
+        state.err = "Some error occured";
+        state.status = "idle";
       })
       .addCase(deleteNote.fulfilled, (state, { payload }) => {
         state.initials = state.initials.filter((init) => init.id !== payload);
         state.completed = state.completed.filter((init) => init.id !== payload);
+        state.status = "idle";
+        state.err = null;
+      })
+      .addCase(deleteNote.rejected, (state) => {
+        state.err = "Some error occured";
+        state.status = "idle";
+        console.log(state.err);
       })
       .addCase(completeNote.fulfilled, (state, { payload }) => {
         const { res, id } = payload;
         state.initials = state.initials.filter((init) => init.id !== id);
         state.completed = res.docs.map((d) => d.data());
+        state.status = "idle";
+        state.err = null;
+      })
+      .addCase(completeNote.rejected, (state) => {
+        state.err = "Some error occured";
+        state.status = "idle";
+        console.log(state.err);
       })
       .addCase(getCompleted.fulfilled, (state, { payload }) => {
         state.completed = payload.docs.map((d) => d.data());
+        state.status = "idle";
+        state.err = null;
+      })
+      .addCase(getCompleted.rejected, (state) => {
+        state.err = "Some error occured";
+        state.status = "idle";
+        console.log(state.err);
       });
-    // .addCase(updateNote.fulfilled, (state, { payload }) => {
-    //   console.log(state.initials);
-    // });
   },
 });
 
