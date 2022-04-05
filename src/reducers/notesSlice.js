@@ -1,4 +1,8 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSlice,
+  isRejectedWithValue,
+} from "@reduxjs/toolkit";
 import { db } from "../firebase";
 import {
   query,
@@ -128,9 +132,11 @@ const notesSlice = createSlice({
         state.status = "idle";
         state.err = null;
       })
-      .addCase(createNote.rejected, (state) => {
-        state.err = "Some error occured";
-        state.status = "idle";
+      .addCase(createNote.rejected, (state, action) => {
+        if (isRejectedWithValue(action)) {
+          state.err = action.payload;
+          state.status = "idle";
+        }
       })
       .addCase(getInitials.fulfilled, (state, { payload }) => {
         const res = payload.docs.map((d) => d.data());
@@ -138,9 +144,11 @@ const notesSlice = createSlice({
         state.status = "idle";
         state.err = null;
       })
-      .addCase(getInitials.rejected, (state) => {
-        state.err = "Some error occured";
-        state.status = "idle";
+      .addCase(getInitials.rejected, (state, action) => {
+        if (isRejectedWithValue(action)) {
+          state.err = action.payload;
+          state.status = "idle";
+        }
       })
       .addCase(deleteNote.fulfilled, (state, { payload }) => {
         state.initials = state.initials.filter((init) => init.id !== payload);
@@ -148,10 +156,11 @@ const notesSlice = createSlice({
         state.status = "idle";
         state.err = null;
       })
-      .addCase(deleteNote.rejected, (state) => {
-        state.err = "Some error occured";
-        state.status = "idle";
-        console.log(state.err);
+      .addCase(deleteNote.rejected, (state, action) => {
+        if (isRejectedWithValue(action)) {
+          state.err = action.payload;
+          state.status = "idle";
+        }
       })
       .addCase(completeNote.fulfilled, (state, { payload }) => {
         const { res, id } = payload;
@@ -160,20 +169,16 @@ const notesSlice = createSlice({
         state.status = "idle";
         state.err = null;
       })
-      .addCase(completeNote.rejected, (state) => {
-        state.err = "Some error occured";
-        state.status = "idle";
-        console.log(state.err);
+      .addCase(completeNote.rejected, (state, action) => {
+        if (isRejectedWithValue(action)) {
+          state.err = action.payload;
+          state.status = "idle";
+        }
       })
       .addCase(getCompleted.fulfilled, (state, { payload }) => {
         state.completed = payload.docs.map((d) => d.data());
         state.status = "idle";
         state.err = null;
-      })
-      .addCase(getCompleted.rejected, (state) => {
-        state.err = "Some error occured";
-        state.status = "idle";
-        console.log(state.err);
       });
   },
 });
